@@ -16,6 +16,8 @@ if(DEFINED CONFIG_STM32_CCM)
   zephyr_linker_sources(SECTIONS ccm.ld)
 endif()
 
+zephyr_sources_ifdef(CONFIG_ARM_CUSTOM_INTERRUPT_CONTROLLER irq_manage.c)
+
 zephyr_sources_ifdef(CONFIG_STM32_BACKUP_SRAM stm32_backup_sram.c)
 zephyr_linker_sources_ifdef(CONFIG_STM32_BACKUP_SRAM SECTIONS stm32_backup_sram.ld)
 
