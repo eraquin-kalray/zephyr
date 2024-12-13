@@ -1376,7 +1376,7 @@ if(CONFIG_GEN_ISR_TABLES)
     --intlist-section .intList
     --intlist-section intList
     $<$<BOOL:${CONFIG_BIG_ENDIAN}>:--big-endian>
-    $<$<BOOL:${CMAKE_VERBOSE_MAKEFILE}>:--debug>
+    --debug
     ${GEN_ISR_TABLE_EXTRA_ARG}
     DEPENDS ${ZEPHYR_LINK_STAGE_EXECUTABLE}
     COMMAND_EXPAND_LISTS

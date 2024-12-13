@@ -43,6 +43,7 @@ def main():
     flash_area_num = 0
 
     # Create the generated header.
+    print(args.header_out)
     with open(args.header_out, "w", encoding="utf-8") as header_file:
         write_top_comment(edt)
 
@@ -394,6 +395,16 @@ def write_interrupts(node: edtlib.Node) -> None:
     name_vals = []
     path_id = node.z_path_id
 
+    debug = False
+    if "can" in node.name or "syscfg" in node.name or "itline" in node.name:
+        debug = True
+    def log_debug(msg: str):
+        if debug:
+            print(msg)
+
+    log_debug(node)
+    log_debug(node.interrupts)
+
     if node.interrupts is not None:
         idx_vals.append((f"{path_id}_IRQ_NUM", len(node.interrupts)))
 
@@ -418,9 +429,11 @@ def write_interrupts(node: edtlib.Node) -> None:
         idx_controller_macro = f"{path_id}_IRQ_IDX_{i}_CONTROLLER"
         idx_controller_path = f"DT_{irq.controller.z_path_id}"
         idx_vals.append((idx_controller_macro, idx_controller_path))
+        log_debug(f"{idx_controller_macro} {idx_controller_path}")
         if irq.name:
             name_controller_macro = f"{path_id}_IRQ_NAME_{str2ident(irq.name)}_CONTROLLER"
             name_vals.append((name_controller_macro, f"DT_{idx_controller_macro}"))
+            # log_debug(f"{name_controller_macro} {idx_controller_macro}")
 
     # Interrupt controller info
     irqs = []
@@ -431,12 +444,14 @@ def write_interrupts(node: edtlib.Node) -> None:
             break
         node = irq.controller
     idx_vals.append((f"{path_id}_IRQ_LEVEL", len(irqs)))
+    log_debug(f"{path_id}_IRQ_LEVEL {len(irqs)}")
 
     for macro, val in idx_vals:
         out_dt_define(macro, val)
     for macro, val in name_vals:
         out_dt_define(macro, val)
 
+    log_debug("")
 
 def write_compatibles(node: edtlib.Node) -> None:
     # Writes a macro for each of the node's compatibles. We don't care
@@ -1000,6 +1015,13 @@ def out_define(
     # adds a deprecation message if given, and allocates whitespace
     # unless told not to.
 
+    debug = False
+    if "soc_S_can" in macro and "CONTROLLER" in macro:
+        debug = True
+    def log_debug(msg: str):
+        if debug:
+            print(msg)
+
     warn = fr' __WARN("{deprecation_msg}")' if deprecation_msg else ""
 
     if width:
@@ -1008,6 +1030,7 @@ def out_define(
         s = f"#define {macro}{warn} {val}"
 
     print(s, file=header_file)
+    log_debug(s)
 
 
 def out_comment(s: str, blank_before=True) -> None:

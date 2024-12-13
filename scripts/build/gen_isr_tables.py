@@ -112,6 +112,7 @@ class gen_isr_config:
             if self.check_sym("CONFIG_2ND_LEVEL_INTERRUPTS"):
                 num_aggregators = self.get_sym("CONFIG_NUM_2ND_LEVEL_AGGREGATORS")
                 self.__irq2_baseoffset = self.get_sym("CONFIG_2ND_LVL_ISR_TBL_OFFSET")
+                print(f"__irq2_baseoffset = {self.__irq2_baseoffset}")
                 self.__irq2_offsets = [self.get_sym('CONFIG_2ND_LVL_INTR_{}_OFFSET'.
                                                   format(str(i).zfill(2))) for i in
                                      range(num_aggregators)]
@@ -313,6 +314,7 @@ def main():
         kernel = ELFFile(fp)
         config = gen_isr_config(args, get_symbols(kernel), log)
         intlist_data = read_intList_sect(kernel, config.get_intlist_snames())
+        print(intlist_data)
 
         if config.check_sym("CONFIG_ISR_TABLES_LOCAL_DECLARATION"):
             parser_module = importlib.import_module('gen_isr_tables_parser_local')
